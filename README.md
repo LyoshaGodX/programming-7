@@ -265,13 +265,13 @@ HTTP-запрос выполнен успешно!
 ```
 Таск 5:
 
-[URL](LR1\urls.txt) \
-[Скрапы](LR1\results.json)
+[URL](LR1/urls.txt) \
+[Скрапы](LR1/results.json)
 
 Таск 6:
 
-[URL](LR1\urls.txt) \
-[Скрапы](LR1\results_async.json)
+[URL](LR1/urls.txt) \
+[Скрапы](LR1/results_async.json)
 
 Таск 7:
 ```
