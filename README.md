@@ -128,5 +128,34 @@ n_iter=100000000:
 
 Таск 4:
 
+Данные записаны в файл example.txt \
+Данные считаны из файла example.txt: Запись в файле
+
 Таск 5:
+
+Event did not occur \
+Состояние события установлено. \
+Event occurred \
+Event occurred \
+... \
+Event occurred \
+Event occurred \
+Событие произошло, третий поток завершает работу. \
+NotOccurredThread завершил работу. \
+Event occurred \
+WaiterThread завершил работу. \
+Состояние события сброшено. \
+SetterThread завершил работу. \
+Все потоки завершены. Программа завершена.
+
+Таск 6:
+
+
+
+Таск 7:
+
+Таск 8:
+
+
+
 
