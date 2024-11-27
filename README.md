@@ -183,3 +183,105 @@ SetterThread завершил работу. \
 [Thread-3] Файл найден: ./test_dir\subdir1\example.txt \
 [Thread-2] Файл найден: ./test_dir\subdir1\example.txt \
 [Thread-4] Поиск завершён (остановлен).
+
+### Часть 4.
+
+Таск 1:
+
+Текущее время: 21:13:46 \
+Текущее время: 21:13:47 \
+Текущее время: 21:13:48 \
+Текущее время: 21:13:49 \
+Текущее время: 21:13:50
+
+Программа завершена.
+
+Таск 2:
+
+2024-11-27 21:21:46 \
+Программа завершена.
+
+Таск 3:
+
+Задача 1 началась... \
+Задача 2 началась... \
+Задача 1 завершена! \
+Задача 2 завершена! \
+Обработка результатов началась... \
+Обработан результат: Результат задачи 1 \
+Обработан результат: Результат задачи 2 \
+Обработка результатов завершена!
+
+Таск 4:
+```
+HTTP-запрос выполнен успешно!
+Запрос к базе данных выполнен успешно!
+
+Обработка результатов:
+
+Результат HTTP-запроса:
+{
+    "URL": "http://rnacentral.org/api/v1/rna/URS0000001C34",
+    "RNA ID": "URS0000001C34",
+    "Description": "rRNA from 1 species",
+    "Sequence (shortened)": "UUGACAUGCAGAGACUUCCAGAGAUGGAUUGGUGCCUUCGGGAACUCUGA...",
+    "Length": 399,
+    "Databases": [
+        "ENA",
+        "SILVA"
+    ]
+}
+
+Результат запроса к базе данных:
+[
+    {
+        "ID": 1,
+        "Name": "ENA",
+        "Description": "provides a comprehensive record of the world's nuc...",
+        "URL": "https://www.ebi.ac.uk/ena/browser/",
+        "Alive": "Y",
+        "Avg Length": 412,
+        "Num Sequences": 12086180
+    },
+    {
+        "ID": 5,
+        "Name": "VEGA",
+        "Description": "is a repository for high-quality gene models produ...",
+        "URL": "http://vega.sanger.ac.uk/",
+        "Alive": "N",
+        "Avg Length": null,
+        "Num Sequences": 0
+    },
+    {
+        "ID": 26,
+        "Name": "GENCODE",
+        "Description": "produces high quality reference gene annotation an...",
+        "URL": "http://gencodegenes.org/",
+        "Alive": "N",
+        "Avg Length": 889,
+        "Num Sequences": 47677
+    }
+]
+```
+Таск 5:
+
+[URL](LR1\urls.txt) \
+[Скрапы](LR1\results.json)
+
+Таск 6:
+
+[URL](LR1\urls.txt) \
+[Скрапы](LR1\results_async.json)
+
+Таск 7:
+```
+Соединение установлено. Введите сообщения (нажмите Ctrl+C для выхода).
+Введите сообщение: Первое сообщение
+Ответ от сервера: {'echo': {'message': 'Первое сообщение'}}
+Введите сообщение: Повторюшка дядя хрюшка
+Ответ от сервера: {'echo': {'message': 'Повторюшка дядя хрюшка'}}
+Введите сообщение: 
+Соединение закрыто.
+```
+
+Вместо реальной реализации серверного и клиентского взаимодействия в лабе был использован mock для симуляции работы с асинхронным соединением. То же самое, но без генерации самоподписанных сертификатов, лень.
