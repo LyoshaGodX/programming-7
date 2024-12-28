@@ -11,7 +11,6 @@ ALLOWED_HOSTS = [
     '.pythonanywhere.com'
 ]
 
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -19,7 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "blog",
+    "blog",  # ваше приложение блога
 ]
 
 MIDDLEWARE = [
@@ -37,7 +36,7 @@ ROOT_URLCONF = "myblog.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / 'templates'],  # Добавляем каталог для шаблонов
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -52,14 +51,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "myblog.wsgi.application"
 
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
 }
-
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -76,17 +73,20 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+# Настройка языка и часового пояса
 LANGUAGE_CODE = "ru-ru"
-
 TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
-
 USE_TZ = True
 
-
+# Настройки для статических файлов
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / 'static'
+
+# Настройки аутентификации и авторизации
+LOGIN_REDIRECT_URL = '/'  # Перенаправление после входа
+LOGOUT_REDIRECT_URL = '/'  # Перенаправление после выхода
+LOGIN_URL = 'login'  # URL для страницы входа
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
