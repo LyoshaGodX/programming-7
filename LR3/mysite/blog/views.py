@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import Group
 from django.http import HttpResponseForbidden
-from .models import Post
+from .models import Post, Poll, Choice
 from .forms import PostForm
 import logging
 
@@ -17,7 +17,8 @@ def is_admin(user):
 
 def post_list(request):
     posts = Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
-    return render(request, 'blog/post_list.html', {'posts': posts})
+    polls = Poll.objects.all()  # Получаем все опросы
+    return render(request, 'blog/post_list.html', {'posts': posts, 'polls': polls})
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
@@ -54,15 +55,96 @@ def post_edit(request, pk):
         form = PostForm(instance=post)
     return render(request, 'blog/post_edit.html', {'form': form})
 
+# Представления для опросов
+def poll_list(request):
+    polls = Poll.objects.all()
+    return render(request, 'blog/poll_list.html', {'polls': polls})
+
+def poll_vote(request, pk):
+    poll = get_object_or_404(Poll, pk=pk)
+
+    # Проверка, проголосовал ли уже пользователь
+    if request.user in poll.voted_users.all():
+        return redirect('poll_results', pk=poll.pk)
+
+    if request.method == "POST":
+        choice_id = request.POST.get("choice")
+        if choice_id:
+            choice = get_object_or_404(Choice, pk=choice_id, poll=poll)
+            choice.votes += 1
+            choice.save()
+            # Добавляем пользователя в список проголосовавших
+            poll.voted_users.add(request.user)
+            poll.save()
+            return redirect('poll_results', pk=poll.pk)
+
+    return render(request, 'blog/poll_vote.html', {'poll': poll})
+
+
+def poll_results(request, pk):
+    poll = get_object_or_404(Poll, pk=pk)
+
+    # Если пользователь не проголосовал, перенаправляем на страницу голосования
+    if request.user not in poll.voted_users.all():
+        return redirect('poll_vote', pk=poll.pk)
+
+    return render(request, 'blog/poll_results.html', {'poll': poll})
+
+@login_required
+@user_passes_test(is_admin)
+def poll_new(request):
+    if request.method == "POST":
+        question = request.POST.get("question")
+        choices_text = request.POST.get("choices")
+        if question and choices_text:
+            # Разделяем введенные варианты на отдельные строки
+            choices = choices_text.splitlines()
+            
+            # Создаем новый опрос
+            poll = Poll.objects.create(question=question, created_date=timezone.now())
+            
+            # Создаем варианты ответов
+            for choice_text in choices:
+                # Игнорируем пустые строки
+                if choice_text.strip():
+                    Choice.objects.create(poll=poll, text=choice_text.strip())
+                    
+            return redirect('poll_list')
+    return render(request, 'blog/poll_new.html')
+
+
+@login_required
+@user_passes_test(is_admin)
+def poll_edit(request, pk):
+    poll = get_object_or_404(Poll, pk=pk)
+    if request.method == "POST":
+        question = request.POST.get("question")
+        choices = request.POST.getlist("choices")
+        if question and choices:
+            poll.question = question
+            poll.save()
+            poll.choices.all().delete()
+            for choice_text in choices:
+                Choice.objects.create(poll=poll, text=choice_text)
+            return redirect('poll_list')
+    return render(request, 'blog/poll_edit.html', {'poll': poll})
+
+@login_required
+@user_passes_test(is_admin)
+def poll_delete(request, pk):
+    poll = get_object_or_404(Poll, pk=pk)
+    poll.delete()
+    return redirect('poll_list')
+
+# Пользовательские представления
 def register(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
-            # Добавляем нового пользователя в группу "CommonUsers"
             common_users_group = Group.objects.get(name='CommonUsers')
             user.groups.add(common_users_group)
-            login(request, user)  # Входим в систему после успешной регистрации
+            login(request, user)
             return redirect('post_list')
         else:
             logger.error("Ошибки формы регистрации: %s", form.errors)
@@ -75,8 +157,8 @@ def login_view(request):
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
-            login(request, user)  # Входим в систему
-            return redirect('post_list')  # Перенаправляем на список постов
+            login(request, user)
+            return redirect('post_list')
         else:
             logger.error("Ошибки формы входа: %s", form.errors)
     else:
@@ -84,5 +166,5 @@ def login_view(request):
     return render(request, 'blog/login.html', {'form': form})
 
 def logout_view(request):
-    logout(request)  # Выполняем выход
-    return redirect('post_list')  # Перенаправляем на главную страницу после выхода
+    logout(request)
+    return redirect('post_list')

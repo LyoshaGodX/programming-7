@@ -2,7 +2,6 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 
-
 class Post(models.Model):
     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     title = models.CharField(max_length=200)
@@ -16,3 +15,22 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Poll(models.Model):
+    question = models.CharField(max_length=255)
+    created_date = models.DateTimeField(default=timezone.now)
+    # Связь многие ко многим с пользователями, которые проголосовали в опросе
+    voted_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='voted_polls', blank=True)
+
+    def __str__(self):
+        return self.question
+
+
+class Choice(models.Model):
+    poll = models.ForeignKey(Poll, related_name='choices', on_delete=models.CASCADE)
+    text = models.CharField(max_length=255)
+    votes = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return self.text

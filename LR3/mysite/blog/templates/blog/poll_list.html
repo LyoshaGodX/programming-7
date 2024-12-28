@@ -1,0 +1,28 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+    <h1>Опросы</h1>
+    <div class="container mt-4" style="max-width: 800px; margin-left: auto; margin-right: auto;">
+        <div class="list-group">
+            {% for poll in polls %}
+                <div class="list-group-item">
+                    <h5>{{ poll.question }}</h5>
+                    {% if user.is_authenticated %}
+                        {% if user in poll.voted_users.all %}
+                            <p>Вы уже проголосовали в этом опросе. <a href="{% url 'poll_results' poll.pk %}">Посмотреть результаты</a></p>
+                        {% else %}
+                            <a href="{% url 'poll_vote' poll.pk %}" class="btn btn-primary">Проголосовать</a>
+                        {% endif %}
+                    {% else %}
+                        <p>Для голосования необходимо <a href="{% url 'login' %}">войти</a>.</p>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>Нет доступных опросов.</p>
+            {% endfor %}
+        </div>
+    </div>
+    {% if user.is_superuser %}
+        <a href="{% url 'poll_new' %}" class="btn btn-primary mt-3">Создать опрос</a>
+    {% endif %}
+{% endblock %}

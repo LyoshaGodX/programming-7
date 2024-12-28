@@ -15,20 +15,47 @@
             <h1><a href="/">Блог</a></h1>
             {% if user.is_authenticated %}
                 <div class="d-flex align-items-center">
-                    <button class="btn btn-light border" onclick="location.href='{% url 'post_new' %}'">Новый пост</button>
-                    <button class="btn btn-light border" onclick="location.href='{% url 'logout' %}'">Выйти</button>
+                    <span class="me-3">Привет, {{ user.username }}!</span> <!-- Имя пользователя -->
+                    <a href="{% url 'post_new' %}" class="btn btn-primary ms-2">Новый пост</a>
+                    <a href="{% url 'poll_new' %}" class="btn btn-primary ms-2">Создать опрос</a> <!-- Кнопка для создания опроса -->
+                    <a href="{% url 'logout' %}" class="btn btn-danger ms-2">Выйти</a>
                 </div>
             {% else %}
                 <div class="d-flex align-items-center">
-                    <a href="{% url 'login' %}" class="btn btn-light border">Вход</a>
-                    <a href="{% url 'register' %}" class="btn btn-light border ms-2">Регистрация</a>
+                    <a href="{% url 'login' %}" class="btn btn-primary ms-2">Вход</a>
+                    <a href="{% url 'register' %}" class="btn btn-secondary ms-2">Регистрация</a>
                 </div>
             {% endif %}
-        </div>   
+        </div>
 
         <div class="content container mt-4" style="max-width: 800px; margin-left: auto; margin-right: auto;">
             {% block content %}
             {% endblock %}
         </div>
+
+        <!-- Раздел с опросами, отображается только на главной странице -->
+        {% if request.path == '/' %}
+            <div class="container mt-4" style="max-width: 800px; margin-left: auto; margin-right: auto;">
+                <h2>Опросы</h2>
+                <div class="list-group">
+                    {% for poll in polls %}
+                        <div class="list-group-item">
+                            <h5>{{ poll.question }}</h5>
+                            {% if user.is_authenticated %}
+                                {% if user in poll.voted_users.all %}
+                                    <p>Вы уже проголосовали в этом опросе. <a href="{% url 'poll_results' poll.pk %}">Посмотреть результаты</a></p>
+                                {% else %}
+                                    <a href="{% url 'poll_vote' poll.pk %}" class="btn btn-primary">Проголосовать</a>
+                                {% endif %}
+                            {% else %}
+                                <p>Для голосования необходимо <a href="{% url 'login' %}">войти</a>.</p>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <p>Нет доступных опросов.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
     </body>
 </html>

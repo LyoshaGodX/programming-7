@@ -1,0 +1,14 @@
+{% extends 'blog/base.html' %}
+
+{% block content %}
+<h1>Создать новый опрос</h1>
+<form method="post">
+    {% csrf_token %}
+    <label for="question">Вопрос:</label>
+    <input type="text" name="question" id="question" class="form-control"><br>
+    <label for="choices">Варианты ответа (по одному на строке):</label>
+    <textarea name="choices" id="choices" class="form-control"></textarea><br>
+    <button type="submit" class="btn btn-primary">Создать</button>
+</form>
+<a href="{% url 'poll_list' %}" class="btn btn-secondary">Назад</a>
+{% endblock %}
