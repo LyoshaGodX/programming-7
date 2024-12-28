@@ -8,7 +8,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '127.0.0.1',
-    '.pythonanywhere.com'
+    '.pythonanywhere.com',
+    'localhost',
 ]
 
 INSTALLED_APPS = [
@@ -18,7 +19,13 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "blog",  # ваше приложение блога
+    "blog",  
+    'django.contrib.sites',  # Обязательно для работы django-allauth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'django_extensions',
 ]
 
 MIDDLEWARE = [
@@ -29,6 +36,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = "myblog.urls"
@@ -41,7 +49,7 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
-                "django.template.context_processors.request",
+                "django.template.context_processors.request",  # Для django-allauth
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
             ],
@@ -73,20 +81,36 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Настройка языка и часового пояса
 LANGUAGE_CODE = "ru-ru"
 TIME_ZONE = "Europe/Moscow"
 
 USE_I18N = True
 USE_TZ = True
 
-# Настройки для статических файлов
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / 'static'
 
-# Настройки аутентификации и авторизации
 LOGIN_REDIRECT_URL = '/'  # Перенаправление после входа
 LOGOUT_REDIRECT_URL = '/'  # Перенаправление после выхода
-LOGIN_URL = 'login'  # URL для страницы входа
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+SITE_ID = 1
+
+ACCOUNT_EMAIL_VERIFICATION = "none"  # Если не хотите верификацию email
+ACCOUNT_AUTHENTICATED_REDIRECT_URL = "/"  # Направление после входа
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '1028613473114-f85hgguqps3f5n1245tt8pdknv03r028.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        }
+    }
+}

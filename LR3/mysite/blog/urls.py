@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 urlpatterns = [
@@ -8,16 +8,14 @@ urlpatterns = [
     path("post/new/", views.post_new, name="post_new"),
     path("post/<int:pk>/edit/", views.post_edit, name="post_edit"),
 
-    # Маршруты для авторизации
-    path("login/", views.login_view, name="login"),
-    path("register/", views.register, name="register"),
-    path("logout/", views.logout_view, name="logout"),
-
     # Маршруты для опросов
     path("polls/", views.poll_list, name="poll_list"),
-    path("polls/<int:pk>/vote/", views.poll_vote, name="poll_vote"),  # Роут для голосования
-    path("polls/<int:pk>/results/", views.poll_results, name="poll_results"),  # Роут для просмотра результатов
+    path("polls/<int:pk>/vote/", views.poll_vote, name="poll_vote"),
+    path("polls/<int:pk>/results/", views.poll_results, name="poll_results"),
     path("polls/new/", views.poll_new, name="poll_new"),
     path("polls/<int:pk>/edit/", views.poll_edit, name="poll_edit"),
     path("polls/<int:pk>/delete/", views.poll_delete, name="poll_delete"),
+
+    # Включение маршрутов для django-allauth
+    path("accounts/", include("allauth.urls")),
 ]

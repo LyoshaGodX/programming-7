@@ -15,15 +15,15 @@
             <h1><a href="/">Блог</a></h1>
             {% if user.is_authenticated %}
                 <div class="d-flex align-items-center">
-                    <span class="me-3">Привет, {{ user.username }}!</span> <!-- Имя пользователя -->
+                    <span class="me-3">Привет, {{ user.username }}!</span>
                     <a href="{% url 'post_new' %}" class="btn btn-primary ms-2">Новый пост</a>
-                    <a href="{% url 'poll_new' %}" class="btn btn-primary ms-2">Создать опрос</a> <!-- Кнопка для создания опроса -->
-                    <a href="{% url 'logout' %}" class="btn btn-danger ms-2">Выйти</a>
+                    <a href="{% url 'poll_new' %}" class="btn btn-primary ms-2">Создать опрос</a>
+                    <a href="{% url 'account_logout' %}" class="btn btn-danger ms-2">Выйти</a>
                 </div>
             {% else %}
                 <div class="d-flex align-items-center">
-                    <a href="{% url 'login' %}" class="btn btn-primary ms-2">Вход</a>
-                    <a href="{% url 'register' %}" class="btn btn-secondary ms-2">Регистрация</a>
+                    <a href="{% url 'account_login' %}" class="btn btn-primary ms-2">Вход</a>
+                    <a href="{% url 'account_signup' %}" class="btn btn-secondary ms-2">Регистрация</a>
                 </div>
             {% endif %}
         </div>
@@ -33,7 +33,6 @@
             {% endblock %}
         </div>
 
-        <!-- Раздел с опросами, отображается только на главной странице -->
         {% if request.path == '/' %}
             <div class="container mt-4" style="max-width: 800px; margin-left: auto; margin-right: auto;">
                 <h2>Опросы</h2>
@@ -48,7 +47,7 @@
                                     <a href="{% url 'poll_vote' poll.pk %}" class="btn btn-primary">Проголосовать</a>
                                 {% endif %}
                             {% else %}
-                                <p>Для голосования необходимо <a href="{% url 'login' %}">войти</a>.</p>
+                                <p>Для голосования необходимо <a href="{% url 'account_login' %}">войти</a>.</p>
                             {% endif %}
                         </div>
                     {% empty %}
