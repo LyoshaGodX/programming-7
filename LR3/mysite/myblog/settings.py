@@ -26,6 +26,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'django_extensions',
+    'rest_framework',
+    'poll_analytics',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [

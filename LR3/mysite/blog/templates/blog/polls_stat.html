@@ -1,0 +1,171 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Статистика опросов</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <link rel="stylesheet" href="{% static 'css/blog.css' %}">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        <style>
+            .poll-item {
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+            .poll-item:hover {
+                background-color: #007bff;
+                color: white;
+            }
+            .poll-item:active {
+                background-color: #0056b3;
+                color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container mt-4" style="max-width: 1400px; margin-left: auto; margin-right: auto;">
+            <h1>Статистика опросов
+                <a href="/" class="btn btn-secondary float-end">На главную</a>
+            </h1>
+            <form id="search-form" class="mb-4">
+                <div class="mb-3">
+                    <label class="form-label">Сортировать по</label>
+                    <div class="btn-group" role="group" aria-label="Sort options">
+                        <input type="radio" class="btn-check" name="sort-by" id="popularity_desc" value="popularity_desc" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="popularity_desc">Популярность (по убыванию)</label>
+
+                        <input type="radio" class="btn-check" name="sort-by" id="popularity_asc" value="popularity_asc" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="popularity_asc">Популярность (по возрастанию)</label>
+
+                        <input type="radio" class="btn-check" name="sort-by" id="date_desc" value="date_desc" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="date_desc">Дата (от новых к старым)</label>
+
+                        <input type="radio" class="btn-check" name="sort-by" id="date_asc" value="date_asc" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="date_asc">Дата (от старых к новым)</label>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" onclick="searchPolls()">Поиск</button>
+            </form>
+            <div class="row">
+                <div class="col-md-6">
+                    <h2 class="text-center">Найденные опросы</h2>
+                    <ul id="polls-list" class="list-group ">
+                        <!-- Динамически добавляемые элементы списка -->
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h2 class="text-center">Статистика опроса</h2>
+                    <div id="poll-stats">
+                        <!-- Динамически отображаемая статистика -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            function searchPolls() {
+                const sortBy = document.querySelector('input[name="sort-by"]:checked').value;
+                let sortParam = '';
+                let orderParam = '';
+
+                if (sortBy === 'popularity_desc') {
+                    sortParam = 'votes';
+                    orderParam = 'desc';
+                } else if (sortBy === 'popularity_asc') {
+                    sortParam = 'votes';
+                    orderParam = 'asc';
+                } else if (sortBy === 'date_desc') {
+                    sortParam = 'date';
+                    orderParam = 'desc';
+                } else if (sortBy === 'date_asc') {
+                    sortParam = 'date';
+                    orderParam = 'asc';
+                } else {
+                    console.error('Неподдерживаемый параметр сортировки');
+                    return;
+                }
+
+                fetch(`http://127.0.0.1:8000/poll_analytics/poll-list/?sort_by=${sortParam}&order=${orderParam}`, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const pollsList = document.getElementById('polls-list');
+                    pollsList.innerHTML = '';
+                    if (data.length === 0) {
+                        const li = document.createElement('li');
+                        li.className = 'list-group-item';
+                        li.textContent = 'Опросы не найдены';
+                        pollsList.appendChild(li);
+                    } else {
+                        data.forEach(poll => {
+                            const li = document.createElement('li');
+                            li.className = 'list-group-item poll-item';
+                            li.textContent = poll.question;
+                            li.onclick = () => showPollStats(poll.id);
+                            pollsList.appendChild(li);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Ошибка:', error);
+                    const pollsList = document.getElementById('polls-list');
+                    pollsList.innerHTML = '<li class="list-group-item">Ошибка при загрузке опросов</li>';
+                });
+            }
+
+            function showPollStats(pollId) {
+                fetch(`http://127.0.0.1:8000/poll_analytics/poll-analytics/?poll_id=${pollId}`, {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    displayPollTextStats(data);
+                    return fetch(`http://127.0.0.1:8000/poll_analytics/poll-chart/?poll_id=${pollId}`, {
+                        method: "GET",
+                        headers: {
+                            "Accept": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        }
+                    });
+                })
+                .then(response => response.json())
+                .then(chartData => {
+                    displayPollChart(chartData);
+                })
+                .catch(error => {
+                    console.error('Ошибка при загрузке данных:', error);
+                    const pollStats = document.getElementById('poll-stats');
+                    pollStats.innerHTML = '<p>Ошибка при загрузке данных</p>';
+                });
+            }
+
+            function displayPollTextStats(data) {
+                const pollStats = document.getElementById('poll-stats');
+                const dateTime = data.date_conducted ? data.date_conducted.split('T') : ['Дата не найдена', 'Время не найдено'];
+                pollStats.innerHTML = `
+                    <h3>${data.question || 'Вопрос не найден'}</h3>
+                    <p>Дата создания: ${dateTime[0]}</p>
+                    <p>Время создания: ${dateTime[1]}</p>
+                `;
+            }
+
+            function displayPollChart(chartData) {
+                const pollStats = document.getElementById('poll-stats');
+                const img = document.createElement('img');
+                img.src = chartData.chart;
+                img.style.width = '100%'; // Добавлено форматирование
+                img.style.height = 'auto'; // Добавлено форматирование
+                pollStats.appendChild(img);
+            }
+        </script>
+    </body>
+</html>

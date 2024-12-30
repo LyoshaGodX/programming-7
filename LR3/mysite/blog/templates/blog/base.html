@@ -18,6 +18,7 @@
                     <span class="me-3">Привет, {{ user.username }}!</span>
                     <a href="{% url 'post_new' %}" class="btn btn-primary ms-2">Новый пост</a>
                     <a href="{% url 'poll_new' %}" class="btn btn-primary ms-2">Создать опрос</a>
+                    <a href="{% url 'polls_stat' %}" class="btn btn-primary ms-2">Статистика опросов</a>
                     <a href="{% url 'account_logout' %}" class="btn btn-danger ms-2">Выйти</a>
                 </div>
             {% else %}

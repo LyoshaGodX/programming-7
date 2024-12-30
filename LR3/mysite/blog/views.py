@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import Group
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from .models import Post, Poll, Choice
 from .forms import PostForm
 import logging
@@ -137,6 +137,32 @@ def poll_delete(request, pk):
     poll.delete()
     return redirect('poll_list')
 
+def polls_stat(request):
+    if request.method == "GET":
+        return render(request, 'blog/polls_stat.html')
+    elif request.method == "POST":
+        sort_by = request.POST.get("sort_by")
+
+        # Логика для сортировки опросов
+        polls = Poll.objects.all()
+        if sort_by == "popularity_desc":
+            polls = polls.annotate(total_votes=Sum('choices__votes')).order_by('-total_votes')
+        elif sort_by == "popularity_asc":
+            polls = polls.annotate(total_votes=Sum('choices__votes')).order_by('total_votes')
+        elif sort_by == "date_asc":
+            polls = polls.order_by('created_date')
+        elif sort_by == "date_desc":
+            polls = polls.order_by('-created_date')
+
+        polls_data = [{"id": poll.id, "question": poll.question} for poll in polls]
+        return JsonResponse({"polls": polls_data})
+
+def poll_stats(request, pk):
+    poll = get_object_or_404(Poll, pk=pk)
+    choices = poll.choices.all()
+    choices_data = [{"text": choice.text, "votes": choice.votes} for choice in choices]
+    return JsonResponse({"question": poll.question, "choices": choices_data})
+
 # Пользовательские представления
 def register(request):
     if request.method == "POST":
@@ -169,3 +195,4 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('post_list')
+

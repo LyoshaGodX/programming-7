@@ -15,6 +15,9 @@ urlpatterns = [
     path("polls/new/", views.poll_new, name="poll_new"),
     path("polls/<int:pk>/edit/", views.poll_edit, name="poll_edit"),
     path("polls/<int:pk>/delete/", views.poll_delete, name="poll_delete"),
+    
+    # Маршрут для статистики опросов
+    path("polls/statistics/", views.polls_stat, name="polls_stat"),
 
     # Включение маршрутов для django-allauth
     path("accounts/", include("allauth.urls")),

@@ -18,9 +18,9 @@ class Post(models.Model):
 
 
 class Poll(models.Model):
+    id = models.AutoField(primary_key=True)
     question = models.CharField(max_length=255)
     created_date = models.DateTimeField(default=timezone.now)
-    # Связь многие ко многим с пользователями, которые проголосовали в опросе
     voted_users = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name='voted_polls', blank=True)
 
     def __str__(self):
