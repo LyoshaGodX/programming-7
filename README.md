@@ -9,6 +9,9 @@
 - [Лабораторная работа 4](#лабораторная-работа-4-применение-форм-в-django)
 - [Практическая работа Django Oauth 2.0](#практическая-работа-настройка-oauth-20-авторизации-в-django-приложении)
 - [Лабораторная работа 5](#лабораторная-работа-5-django-rest-framework)
+- [Java. Spring Boot. RESTful сервис задач](#java-spring-boot-restful-сервис-задач)
+- [Реализация двустороннего общения между микросервисами через Apache Kafka](#реализация-двустороннего-общения-между-микросервисами-через-apache-kafka)
+
 
 ## Лабораторная работа 1
 
@@ -507,3 +510,185 @@ GET /poll-analytics/poll-chart/?poll_id=1
 #### Страница со статистикой по опросам
 
 ![Статистика](img/16.png)
+
+## Java. Spring Boot. RESTful сервис задач
+
+Сервис задач - это RESTful веб-приложение для управления задачами. Оно позволяет пользователям создавать, читать, обновлять и удалять задачи. Каждая задача имеет заголовок, описание, статус и временную метку создания.
+
+> Возможности
+
+- Создание новой задачи
+- Получение всех задач
+- Обновление существующей задачи
+- Удаление задачи
+- Поиск задач по заголовку
+- Поиск задач по описанию
+- Поиск задач по статусу
+- Поиск задач по временной метке создания
+
+> Начало работы
+
+Необходимые условия
+
+- Java 23
+- Maven
+
+> Установка
+
+1. Клонируйте репозиторий:
+  ```sh
+  git clone <repository-url>
+  ```
+2. Перейдите в директорию проекта:
+  ```sh
+  cd task-service
+  ```
+3. Соберите проект:
+  ```sh
+  mvn clean install
+  ```
+
+> Запуск приложения
+
+Для запуска приложения используйте следующую команду:
+```sh
+mvn spring-boot:run
+```
+Приложение будет доступно по адресу `http://localhost:8080`.
+
+> API Эндпоинты
+
+- `GET /api/tasks` - Получить все задачи
+- `POST /api/tasks` - Создать новую задачу
+- `PUT /api/tasks/{id}` - Обновить существующую задачу
+- `DELETE /api/tasks/{id}` - Удалить задачу
+- `GET /api/tasks/title/{title}` - Найти задачи по заголовку
+- `GET /api/tasks/description/{description}` - Найти задачи по описанию
+- `GET /api/tasks/status/{status}` - Найти задачи по статусу
+- `GET /api/tasks/createdAt/{createdAt}` - Найти задачи по временной метке создания
+
+> Примеры
+
+ Создание новой задачи
+```sh
+curl -X POST http://localhost:8080/api/tasks -H "Content-Type: application/json" -d '{
+  "title": "Новая задача",
+  "description": "Это новая задача",
+  "status": "В ожидании"
+}'
+```
+
+Получение всех задач
+```sh
+curl http://localhost:8080/api/tasks
+```
+
+Обновление задачи
+```sh
+curl -X PUT http://localhost:8080/api/tasks/1 -H "Content-Type: application/json" -d '{
+  "title": "Обновленная задача",
+  "description": "Это обновленная задача",
+  "status": "В процессе"
+}'
+```
+
+Удаление задачи
+```sh
+curl -X DELETE http://localhost:8080/api/tasks/1
+```
+
+Поиск задач по заголовку
+```sh
+curl http://localhost:8080/api/tasks/title/Новая%20задача
+```
+
+Поиск задач по описанию
+```sh
+curl http://localhost:8080/api/tasks/description/Это%20новая%20задача
+```
+
+Поиск задач по статусу
+```sh
+curl http://localhost:8080/api/tasks/status/В%20ожидании
+```
+
+Поиск задач по временной метке создания
+```sh
+curl http://localhost:8080/api/tasks/createdAt/2023-10-01T12:00:00
+```
+
+
+## Реализация двустороннего общения между микросервисами через Apache Kafka
+
+Проект демонстрирует двустороннюю передачу данных между двумя микросервисами с использованием Apache Kafka. Оба микросервиса (AppA и AppB) отправляют и получают сообщения через топики Kafka и выводят их в консоль.
+
+> Подготовка
+
+Запуск Kafka с использованием Docker Compose:
+```bash
+docker-compose up -d
+```
+
+Или
+```bash
+sudo docker compose up -d
+```
+
+> Сборка и запуск приложений:
+1. Перейдите в каталог `zoo-kafka-app-a` или `zoo-kafka-app-b`:
+   ```bash
+   cd zoo-kafka-app-a
+   mvn spring-boot:run
+   ```
+2. Запустите оба приложения для проверки взаимодействия.
+
+
+> Используемые технологии:
+- Java 23
+- Spring Boot
+  - spring-boot-starter
+  - spring-kafka
+- Apache Kafka
+- Docker (для запуска Kafka)
+
+> Функциональность:
+1. AppA:
+   - Отправляет случайно сгенерированные сообщения в топик `appA-to-appB`.
+   - Принимает сообщения из топика `appB-to-appA`.
+2. AppB:
+   - Отправляет сообщения в топик `appB-to-appA`.
+   - Принимает сообщения из топика `appA-to-appB`.
+3. Логирование отправленных и полученных сообщений в консоль.
+
+> Пример конфигурации `application.properties`:
+
+Для AppA:
+```properties
+spring.kafka.bootstrap-servers=localhost:9092
+app.kafka.topic.send=appA-to-appB
+app.kafka.topic.receive=appB-to-appA
+spring.kafka.consumer.group-id=appAGroup
+spring.kafka.consumer.auto-offset-reset=earliest
+spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+```
+
+Для AppB:
+```properties
+spring.kafka.bootstrap-servers=localhost:9092
+app.kafka.topic.send=appB-to-appA
+app.kafka.topic.receive=appA-to-appB
+spring.kafka.consumer.group-id=appBGroup
+spring.kafka.consumer.auto-offset-reset=earliest
+spring.kafka.consumer.key-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.consumer.value-deserializer=org.apache.kafka.common.serialization.StringDeserializer
+spring.kafka.producer.key-serializer=org.apache.kafka.common.serialization.StringSerializer
+spring.kafka.producer.value-serializer=org.apache.kafka.common.serialization.StringSerializer
+```
+
+> Результаты работы:
+- Оба приложения обмениваются сообщениями через Kafka.
+- Сообщения отображаются в консоли каждого приложения.
+- Обеспечена обработка ошибок и базовое логирование.

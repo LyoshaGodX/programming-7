@@ -9,7 +9,7 @@ urlpatterns = [
     path("post/<int:pk>/edit/", views.post_edit, name="post_edit"),
 
     # Маршруты для опросов
-    path("polls/", views.poll_list, name="poll_list"),
+    path("polls/", views.polls_list, name="polls_list"),
     path("polls/<int:pk>/vote/", views.poll_vote, name="poll_vote"),
     path("polls/<int:pk>/results/", views.poll_results, name="poll_results"),
     path("polls/new/", views.poll_new, name="poll_new"),

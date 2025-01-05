@@ -14,7 +14,7 @@
         {% endfor %}
     </div>
 
-    <a href="{% url 'poll_list' %}" class="btn btn-secondary mt-3">Назад к списку</a>
+    <a href="{% url 'polls_list' %}" class="btn btn-secondary mt-3">Назад к списку</a>
 
     {% if user.is_superuser %}
         <div class="mt-3">

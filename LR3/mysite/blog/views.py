@@ -57,7 +57,7 @@ def post_edit(request, pk):
     return render(request, 'blog/post_edit.html', {'form': form})
 
 # Представления для опросов
-def poll_list(request):
+def polls_list(request):
     polls = Poll.objects.all()
     return render(request, 'blog/poll_list.html', {'polls': polls})
 
@@ -110,7 +110,7 @@ def poll_new(request):
                 if choice_text.strip():
                     Choice.objects.create(poll=poll, text=choice_text.strip())
                     
-            return redirect('poll_list')
+            return redirect('polls_list')
     return render(request, 'blog/poll_new.html')
 
 
@@ -127,7 +127,7 @@ def poll_edit(request, pk):
             poll.choices.all().delete()
             for choice_text in choices:
                 Choice.objects.create(poll=poll, text=choice_text)
-            return redirect('poll_list')
+            return redirect('polls_list')
     return render(request, 'blog/poll_edit.html', {'poll': poll})
 
 @login_required
@@ -135,7 +135,7 @@ def poll_edit(request, pk):
 def poll_delete(request, pk):
     poll = get_object_or_404(Poll, pk=pk)
     poll.delete()
-    return redirect('poll_list')
+    return redirect('polls_list')
 
 def polls_stat(request):
     if request.method == "GET":
